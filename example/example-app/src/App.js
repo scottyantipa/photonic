@@ -1,23 +1,16 @@
 import React from 'react';
 
-import NestedStates from './example-components/NestedStates';
+// import NestedStates from './example-components/NestedStates';
 
-import EnumClassic from './example-components/Enum/EnumClassic';
+// import EnumClassic from './example-components/Enum/EnumClassic';
 import EnumPartitioned from './example-components/Enum/EnumPartitioned';
 
-import SFCPartitioned from './example-components/SimpleSFC/Partitioned';
+// import SFCPartitioned from './example-components/SimpleSFC/Partitioned';
 
 const App = () =>
   <div className="application">
     <Card>
-      <NestedStates />
-    </Card>
-    <Card>
       <EnumPartitioned />
-    </Card>
-    <Card><EnumClassic /></Card>
-    <Card>
-      <SFCPartitioned isLoading={false} />
     </Card>
   </div>;
 
@@ -35,6 +28,5 @@ const Card = ({ children }) => {
     </div>
   );
 };
-
 
 export default App;

@@ -1,7 +1,7 @@
 import React from 'react';
 import partitionOn from '../../react-partition';
 
-import { Negative, Zero, Even, Odd } from './BaseComponents';
+import { Negative, Zero, Even, Odd, Controls } from './BaseComponents';
 
 const labelPartitions = [
   {
@@ -34,14 +34,6 @@ const labelPartitions = [
     Comp: Odd
   }
 ];
-
-const Controls = ({ bumpA, bumpB }) =>
-  <div>
-    <button onClick={bumpA(1)}>a++</button>
-    <button onClick={bumpB(1)}>b++</button>
-    <button onClick={bumpA(-1)}>a--</button>
-    <button onClick={bumpB(-1)}>b--</button>
-  </div>;
 
 const buttonsPartition = {
   test: () => true,

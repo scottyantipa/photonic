@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Negative, Zero, Even, Odd } from './BaseComponents';
+import { Negative, Zero, Even, Odd, Controls } from './BaseComponents';
 
 class EnumClassic extends React.Component {
   constructor() {
@@ -31,12 +31,7 @@ class EnumClassic extends React.Component {
     return (
       <div>
         {label}
-        <div>
-          <button onClick={bumpA(1)}>a++</button>
-          <button onClick={bumpB(1)}>b++</button>
-          <button onClick={bumpA(-1)}>a--</button>
-          <button onClick={bumpB(-1)}>b--</button>
-        </div>
+        <Controls bumpA={bumpA} bumpB={bumpB} />
       </div>
     )
   }
