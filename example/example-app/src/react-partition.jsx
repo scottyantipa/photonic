@@ -1,9 +1,12 @@
 import React from 'react';
 
 const render = (partition, props, state, self) => {
-  const { test, reduce, Comp } = partition;
-  if (test({ props, state, self })) {
-    const subProps = reduce({ props, state, self });
+  const { when, withProps, show } = partition;
+  const Comp = show;
+
+  const isActive = when({ props, state, self });
+  if (isActive) {
+    const subProps = withProps({ props, state, self });
     return <Comp {...subProps} />;
   } else {
     return undefined;

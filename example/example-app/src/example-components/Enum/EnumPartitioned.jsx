@@ -5,44 +5,43 @@ import { Negative, Zero, Even, Odd, Controls } from './BaseComponents';
 
 const labelPartitions = [
   {
-    test: ({ state }) => (state.a + state.b < 0),
-    reduce: ({ state }) => ({ value: state.a + state.b }),
-    Comp: Negative
+    show: Negative,
+    withProps: ({ state }) => ({ value: state.a + state.b }),
+    when: ({ state }) => (state.a + state.b < 0)
   },
 
   {
-    test: ({ state }) => (state.a + state.b) === 0,
-    reduce: () => ({}),
-    Comp: Zero,
+    show: Zero,
+    withProps: () => ({}),
+    when: ({ state }) => (state.a + state.b) === 0
   },
 
   {
-    test: ({ state }) => {
+    show: Even,
+    withProps: () => ({}),
+    when: ({ state }) => {
       const { a, b } = state;
       return (a + b > 0) && ((a + b) % 2 === 0);
-    },
-    reduce: () => ({}),
-    Comp: Even,
+    }
   },
-
   {
-    test: ({ state }) => {
+    show: Odd,
+    withProps: () => ({}),
+    when: ({ state }) => {
       const { a, b } = state;
       return (a + b > 0) && ((a + b) % 2 === 1);
-    },
-    reduce: () => ({}),
-    Comp: Odd
+    }
   }
 ];
 
 const buttonsPartition = {
-  test: () => true,
-  reduce: ({ state, self }) => {
+  show: Controls,
+  withProps: ({ state, self }) => {
     const bumpA = (int) => () => self.setState({ a: state.a + int });
     const bumpB = (int) => () => self.setState({ b: state.b + int });
     return { bumpA, bumpB };
   },
-  Comp: Controls
+  when: () => true
 }
 
 class EnumPartitioned extends React.Component {

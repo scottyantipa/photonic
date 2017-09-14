@@ -12,9 +12,6 @@ class EnumClassic extends React.Component {
   }
 
   render() {
-    const bumpA = (int) => () => this.setState({ a: this.state.a + int });
-    const bumpB = (int) => () => this.setState({ b: this.state.b + int });
-
     const { a, b } = this.state;
     let label;
 
@@ -28,6 +25,8 @@ class EnumClassic extends React.Component {
       label = <Odd />;
     }
 
+    const bumpA = (int) => () => this.setState({ a: this.state.a + int });
+    const bumpB = (int) => () => this.setState({ b: this.state.b + int });
     return (
       <div>
         {label}

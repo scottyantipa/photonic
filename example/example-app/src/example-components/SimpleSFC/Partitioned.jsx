@@ -6,14 +6,14 @@ const Loaded = () => <span>Loaded!</span>;
 
 const partitions = [
   {
-    test: ({ props }) => Boolean(props.isLoading),
-    reduce: ({ props }) => ({}),
-    Comp: Loading
+    show: Loading,
+    withProps: ({ props }) => ({}),
+    when: ({ props }) => Boolean(props.isLoading)
   },
   {
-    test: ({ props }) => !Boolean(props.isLoading),
-    reduce: ({ props }) => ({}),
-    Comp: Loaded
+    show: Loaded,
+    withProps: ({ props }) => ({}),
+    when: ({ props }) => !Boolean(props.isLoading)
   }
 ];
 

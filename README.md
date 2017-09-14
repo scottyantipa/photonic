@@ -12,10 +12,7 @@ Without react-partition
 ```
 import React from 'react';
 
-const Negative = ({ value }) => <p>NEGATIVE ({value})</p>;
-const Zero = () => <p>ZERO</p>;
-const Even = () => <p>EVEN</p>;
-const Odd = () => <p>ODD</p>;
+import { Negative, Zero, Even, Odd, Controls } from 'some/magical/place';
 
 class EnumClassic extends React.Component {
   constructor() {
@@ -27,11 +24,9 @@ class EnumClassic extends React.Component {
   }
 
   render() {
-    const bumpA = (int) => () => this.setState({ a: this.state.a + int });
-    const bumpB = (int) => () => this.setState({ b: this.state.b + int });
-
     const { a, b } = this.state;
     let label;
+
     if (a + b < 0) {
       label = <Negative value={a + b} />;
     } else if (a + b === 0) {
@@ -42,15 +37,13 @@ class EnumClassic extends React.Component {
       label = <Odd />;
     }
 
+    const bumpA = (int) => () => this.setState({ a: this.state.a + int });
+    const bumpB = (int) => () => this.setState({ b: this.state.b + int });
+
     return (
       <div>
         {label}
-        <div>
-          <button onClick={bumpA(1)}>a++</button>
-          <button onClick={bumpB(1)}>b++</button>
-          <button onClick={bumpA(-1)}>a--</button>
-          <button onClick={bumpB(-1)}>b--</button>
-        </div>
+        <Controls bumpA={bumpA} bumpB={bumpB} />
       </div>
     )
   }
@@ -63,46 +56,48 @@ With react-partition
 import React from 'react';
 import partitionOn from 'react-partition';
 
-const Negative = ({ value }) => <p>NEGATIVE ({value})</p>;
-const Zero = () => <p>ZERO</p>;
-const Even = () => <p>EVEN</p>;
-const Odd = () => <p>ODD</p>;
+import { Negative, Zero, Even, Odd, Controls } from 'some/magical/place';
 
-const partitions = [
+const labelPartitions = [
   {
-    test: ({ state }) => (state.a + state.b < 0),
-    reduce: ({ state }) => ({ value: state.a + state.b }),
-    Comp: Negative
+    show: Negative,
+    withProps: ({ state }) => ({ value: state.a + state.b }),
+    when: ({ state }) => (state.a + state.b < 0)
   },
 
   {
-    test: ({ state }) => {
-      const { a, b } = state;
-      return a + b === 0;
-    },
-    reduce: () => ({}),
-    Comp: Zero,
+    show: Zero,
+    withProps: () => ({}),
+    when: ({ state }) => (state.a + state.b) === 0
   },
 
   {
-    test: ({ state }) => {
+    show: Even,
+    withProps: () => ({}),
+    when: ({ state }) => {
       const { a, b } = state;
       return (a + b > 0) && ((a + b) % 2 === 0);
-    },
-    reduce: () => ({}),
-    Comp: Even,
+    }
   },
-
   {
-    test: ({ state }) => {
+    show: Odd,
+    withProps: () => ({}),
+    when: ({ state }) => {
       const { a, b } = state;
       return (a + b > 0) && ((a + b) % 2 === 1);
-    },
-    reduce: () => ({}),
-    Comp: Odd
+    }
   }
 ];
 
+const buttonsPartition = {
+  show: Controls,
+  withProps: ({ state, self }) => {
+    const bumpA = (int) => () => self.setState({ a: state.a + int });
+    const bumpB = (int) => () => self.setState({ b: state.b + int });
+    return { bumpA, bumpB };
+  },
+  when: () => true // always render it
+}
 
 class EnumPartitioned extends React.Component {
   constructor() {
@@ -114,18 +109,13 @@ class EnumPartitioned extends React.Component {
   }
 
   render() {
-    const bumpA = (int) => () => this.setState({ a: this.state.a + int });
-    const bumpB = (int) => () => this.setState({ b: this.state.b + int });
+    const { props, state } = this;
+    const $p = partitionOn(props, state, this);
 
     return (
       <div>
-        {partitionOn(this)(partitions)}
-        <div>
-          <button onClick={bumpA(1)}>a++</button>
-          <button onClick={bumpB(1)}>b++</button>
-          <button onClick={bumpA(-1)}>a--</button>
-          <button onClick={bumpB(-1)}>b--</button>
-        </div>
+        {$p(labelPartitions)}
+        {$p(buttonsPartition)}
       </div>
     );
   }
