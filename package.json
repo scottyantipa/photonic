@@ -1,0 +1,12 @@
+{
+  "name": "react-partition",
+  "version": "0.0.1",
+  "description": "Partition your React components based on props and state",
+  "main": "react-partition.jsx",
+  "author": "Scott Antipa",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "react": "^14.0.0"
+  }
+}
