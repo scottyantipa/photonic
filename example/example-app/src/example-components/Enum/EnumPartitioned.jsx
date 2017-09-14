@@ -63,7 +63,8 @@ class EnumPartitioned extends React.Component {
   }
 
   render() {
-    const $p = partitionOn(this);
+    const { props, state } = this;
+    const $p = partitionOn(props, state, this);
 
     return (
       <div>

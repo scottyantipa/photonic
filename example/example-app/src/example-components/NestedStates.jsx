@@ -64,7 +64,10 @@ class NestedStates extends React.Component {
   }
 
   render() {
-    return partitionOn(this)([
+    const { props, state } = this;
+    const $p = partitionOn(props, state, this);
+
+    return $p([
       AckPartition,
       TextPartition
     ]);

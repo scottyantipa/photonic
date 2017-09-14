@@ -1,8 +1,7 @@
 import React from 'react';
 
-const render = (partition, self) => {
+const render = (partition, props, state, self) => {
   const { test, reduce, Comp } = partition;
-  const { props, state } = self;
   if (test({ props, state, self })) {
     const subProps = reduce({ props, state, self });
     return <Comp {...subProps} />;
@@ -11,21 +10,21 @@ const render = (partition, self) => {
   }
 };
 
-const processEnum = (partitions, self) => {
+const processEnum = (partitions, props, state, self) => {
   for (let idx in partitions) {
-    const rendered = render(partitions[idx], self);
+    const rendered = render(partitions[idx], props, state, self);
     if (rendered) return rendered;
   }
   console.warn('Did not find component to render from partition set: ', partitions);
   return undefined;
 }
 
-const partitionOn = (self) => {
+const partitionOn = (props, state, self) => {
   return (partition) => {
     return Array.isArray(partition) ?
-      processEnum(partition, self)
+      processEnum(partition, props, state, self)
       :
-      render(partition, self);
+      render(partition, props, state, self);
   };
 };
 
