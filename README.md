@@ -9,7 +9,7 @@ Benefits:
 * Get console warnings when your component gets in an unintended state
 
 Without react-partition
-```
+```jsx
 import React from 'react';
 
 import { Negative, Zero, Even, Odd, Controls } from 'some/magical/place';
@@ -52,7 +52,7 @@ class EnumClassic extends React.Component {
 ```
 
 With react-partition
-```
+```jsx
 import React from 'react';
 import partitionOn from 'react-partition';
 
