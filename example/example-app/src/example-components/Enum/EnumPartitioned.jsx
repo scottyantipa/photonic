@@ -9,13 +9,11 @@ const labelPartitions = [
     withProps: ({ state }) => ({ value: state.a + state.b }),
     when: ({ state }) => (state.a + state.b < 0)
   },
-
   {
     show: Zero,
     withProps: () => ({}),
     when: ({ state }) => (state.a + state.b) === 0
   },
-
   {
     show: Even,
     withProps: () => ({}),

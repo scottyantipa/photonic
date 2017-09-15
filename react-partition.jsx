@@ -1,36 +1,42 @@
 import React from 'react';
 
-const render = (partition, props, state, self) => {
-  const { when, withProps, show } = partition;
+const render = (partition, position) => {
+  const { withProps, show } = partition;
   const Comp = show;
-
-  const isActive = when({ props, state, self });
-  if (isActive) {
-    const subProps = withProps({ props, state, self });
-    return <Comp {...subProps} />;
-  } else {
-    return undefined;
-  }
+  const props = withProps(position);
+  return <Comp {...props} />;
 };
 
-const processEnum = (partitions, props, state, self) => {
+const processEnum = (partitions, position) => {
   for (let idx in partitions) {
-    const rendered = render(partitions[idx], props, state, self);
-    if (rendered) return rendered;
+    const partition = partitions[idx];
+    if (partition.when(position)) {
+      return partition;
+    }
   }
-  console.warn('Did not find component to render from partition set: ', partitions);
   return undefined;
 }
 
-const partitionOn = ({ props, state, self }) => {
-  return (partition) => {
-    return Array.isArray(partition) ?
-      processEnum(partition, props, state, self)
-      :
-      render(partition, props, state, self);
+const activePartition = (oneOrEnum, position) => {
+  let partition;
+
+  if (Array.isArray(oneOrEnum)) {
+    partition = processEnum(oneOrEnum, position);
+    if (!partition) console.warn('Could not find partition in set: ', oneOrEnum, ' for: ', position);
+  } else {
+    if (oneOrEnum.when(position)) {
+      partition = oneOrEnum;
+    }
+  }
+
+  return partition;
+}
+
+const partitionOn = (position) => {
+  return (oneOrEnum) => {
+    const partition = activePartition(oneOrEnum, position);
+    return partition ? render(partition, position) : undefined;
   };
 };
-
-
 
 export default partitionOn;
