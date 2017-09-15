@@ -1,5 +1,5 @@
 import React from 'react';
-import partitionOn from '../../react-partition';
+import partitionOn, { log } from '../../react-partition';
 
 import { Negative, Zero, Even, Odd, Controls } from './BaseComponents';
 
@@ -49,6 +49,16 @@ class EnumPartitioned extends React.Component {
       a: 0,
       b: 0
     };
+  }
+
+  shouldComponentUpdate(newProps, newState) {
+    log(
+      labelPartitions,
+      { props: this.props, state: this.state, self: this },
+      { props: newProps, state: newState, self: this }
+    );
+
+    return true;
   }
 
   render() {

@@ -1,5 +1,9 @@
 import React from 'react';
 
+const getDisplayName = (reactComponent) => {
+  return reactComponent.displayName || reactComponent.name || 'Component';
+};
+
 const render = (partition, position) => {
   const { withProps, show } = partition;
   const Comp = show;
@@ -32,6 +36,17 @@ const activePartition = (oneOrEnum, position) => {
   return partition;
 }
 
+const log = (partition, position0, position1) => {
+  const active0 = activePartition(partition, position0);
+  const active1 = activePartition(partition, position1);
+
+  const name = 'an empty state';
+  const name0 = active0 ? getDisplayName(active0.show) : name;
+  const name1 = active1 ? getDisplayName(active1.show) : name;
+
+  console.log(`${name0} --> ${name1}`);
+}
+
 const partitionOn = (position) => {
   return (oneOrEnum) => {
     const partition = activePartition(oneOrEnum, position);
@@ -39,4 +54,5 @@ const partitionOn = (position) => {
   };
 };
 
+export { log };
 export default partitionOn;
