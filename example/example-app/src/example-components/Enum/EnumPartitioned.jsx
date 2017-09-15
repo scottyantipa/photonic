@@ -34,7 +34,7 @@ const labelPartitions = [
   }
 ];
 
-const buttonsPartition = {
+const controlsPartion = {
   show: Controls,
   withProps: ({ state, self }) => {
     const bumpA = (int) => () => self.setState({ a: state.a + int });
@@ -60,7 +60,7 @@ class EnumPartitioned extends React.Component {
     return (
       <div>
         {$p(labelPartitions)}
-        {$p(buttonsPartition)}
+        {$p(controlsPartion)}
       </div>
     );
   }
