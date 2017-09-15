@@ -18,7 +18,7 @@ const partitions = [
 ];
 
 const DataLoading = (props) => {
-  return partitionOn(props)(partitions);
+  return partitionOn({ props })(partitions);
 };
 
 export default DataLoading;

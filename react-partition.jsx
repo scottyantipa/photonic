@@ -22,7 +22,7 @@ const processEnum = (partitions, props, state, self) => {
   return undefined;
 }
 
-const partitionOn = (props, state, self) => {
+const partitionOn = ({ props, state, self }) => {
   return (partition) => {
     return Array.isArray(partition) ?
       processEnum(partition, props, state, self)
@@ -30,5 +30,7 @@ const partitionOn = (props, state, self) => {
       render(partition, props, state, self);
   };
 };
+
+
 
 export default partitionOn;
