@@ -58,19 +58,17 @@ import partitionOn from 'react-partition';
 
 import { Negative, Zero, Even, Odd, Controls } from 'some/magical/place';
 
-const labelPartitions = [
+const partLabel = partitionOn([
   {
     show: Negative,
     withProps: ({ state }) => ({ value: state.a + state.b }),
     when: ({ state }) => (state.a + state.b < 0)
   },
-
   {
     show: Zero,
     withProps: () => ({}),
     when: ({ state }) => (state.a + state.b) === 0
   },
-
   {
     show: Even,
     withProps: () => ({}),
@@ -87,17 +85,17 @@ const labelPartitions = [
       return (a + b > 0) && ((a + b) % 2 === 1);
     }
   }
-];
+]);
 
-const buttonsPartition = {
+const partControl = partitionOn({
   show: Controls,
   withProps: ({ state, self }) => {
     const bumpA = (int) => () => self.setState({ a: state.a + int });
     const bumpB = (int) => () => self.setState({ b: state.b + int });
     return { bumpA, bumpB };
   },
-  when: () => true // always render it
-}
+  when: () => true
+});
 
 class EnumPartitioned extends React.Component {
   constructor() {
@@ -108,16 +106,33 @@ class EnumPartitioned extends React.Component {
     };
   }
 
+
   render() {
-    const { props, state } = this;
-    const $p = partitionOn(props, state, this);
+    const position = { props: this.props, state: this.state, self: this };
 
     return (
       <div>
-        {$p(labelPartitions)}
-        {$p(buttonsPartition)}
+        {partLabel(position)}
+        {partControl(position)}
       </div>
     );
+  }
+}
+```
+
+Log state transitions for class based components:
+```jsx
+import React from 'react';
+import { log }, partitionOn from 'react-partition';
+
+class MyComponent extends React.Component {
+  shouldComponentUpdate(newProps, newState) {
+    log(
+      labelPartitions,
+      { props: this.props, state: this.state, self: this },
+      { props: newProps, state: newState, self: this }
+    );
+    return true;
   }
 }
 ```

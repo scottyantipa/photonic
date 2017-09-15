@@ -1,24 +1,27 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import partitionOn from '../../react-partition';
 
 const Loading = () => <span>Loading...</span>;
 const Loaded = () => <span>Loaded!</span>;
 
-const partitions = [
+const part = partitionOn([
   {
     show: Loading,
     withProps: ({ props }) => ({}),
-    when: ({ props }) => Boolean(props.isLoading)
+    when: ({ props }) => props.isLoading
   },
   {
     show: Loaded,
     withProps: ({ props }) => ({}),
-    when: ({ props }) => !Boolean(props.isLoading)
+    when: ({ props }) => !props.isLoading
   }
-];
+]);
 
 const DataLoading = (props) => {
-  return partitionOn({ props })(partitions);
+  return part({ props });
 };
+
+DataLoading.propTypes = { isLoading: PropTypes.bool };
 
 export default DataLoading;

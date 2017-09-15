@@ -1,9 +1,9 @@
 import React from 'react';
-import partitionOn, { log } from '../../react-partition';
+import partitionOn from '../../react-partition';
 
 import { Negative, Zero, Even, Odd, Controls } from './BaseComponents';
 
-const labelPartitions = [
+const partLabel = partitionOn([
   {
     show: Negative,
     withProps: ({ state }) => ({ value: state.a + state.b }),
@@ -30,9 +30,9 @@ const labelPartitions = [
       return (a + b > 0) && ((a + b) % 2 === 1);
     }
   }
-];
+]);
 
-const controlsPartion = {
+const partControl = partitionOn({
   show: Controls,
   withProps: ({ state, self }) => {
     const bumpA = (int) => () => self.setState({ a: state.a + int });
@@ -40,7 +40,7 @@ const controlsPartion = {
     return { bumpA, bumpB };
   },
   when: () => true
-}
+});
 
 class EnumPartitioned extends React.Component {
   constructor() {
@@ -51,24 +51,14 @@ class EnumPartitioned extends React.Component {
     };
   }
 
-  shouldComponentUpdate(newProps, newState) {
-    log(
-      labelPartitions,
-      { props: this.props, state: this.state, self: this },
-      { props: newProps, state: newState, self: this }
-    );
-
-    return true;
-  }
 
   render() {
-    const { props, state } = this;
-    const $p = partitionOn({ props, state, self: this });
+    const position = { props: this.props, state: this.state, self: this };
 
     return (
       <div>
-        {$p(labelPartitions)}
-        {$p(controlsPartion)}
+        {partLabel(position)}
+        {partControl(position)}
       </div>
     );
   }

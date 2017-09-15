@@ -47,8 +47,8 @@ const log = (partition, position0, position1) => {
   console.log(`${name0} --> ${name1}`);
 }
 
-const partitionOn = (position) => {
-  return (oneOrEnum) => {
+const partitionOn = (oneOrEnum) => {
+  return (position) => {
     const partition = activePartition(oneOrEnum, position);
     return partition ? render(partition, position) : undefined;
   };
