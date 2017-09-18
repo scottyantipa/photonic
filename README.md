@@ -116,7 +116,7 @@ class EnumClassic extends React.Component {
 
 
 Log state transitions for class based components:
-For example, the below will print `Zero --> Negative`, `Even --> Odd`, etc, if used witht he component above.
+For example, the below will print `Zero --> Negative`, `Even --> Odd`, etc, if used with the component above.
 ```jsx
 import React from 'react';
 import { log }, partitionOn from 'photonic';
