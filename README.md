@@ -1,55 +1,6 @@
 # photonic
 
-Partition your React components based on the props and state required to render each piece.
-
-Benefits:
-* Quickly see the possible states your component can be rendered in
-* See what pieces of props & state each of these states needs to render
-* No more if/else or switch control statements.  Instead, declaratively define the states of your component and how it looks in each.
-* Get console warnings when your component gets in an unintended state
-
-Without photonic
-```jsx
-import React from 'react';
-
-import { Negative, Zero, Even, Odd, Controls } from 'some/magical/place';
-
-class EnumClassic extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      a: 0,
-      b: 0
-    }
-  }
-
-  render() {
-    const { a, b } = this.state;
-    let label;
-
-    if (a + b < 0) {
-      label = <Negative value={a + b} />;
-    } else if (a + b === 0) {
-      label = <Zero />
-    } else if ((a + b) % 2 === 0) {
-      label = <Even />;
-    } else {
-      label = <Odd />;
-    }
-
-    const bumpA = (int) => () => this.setState({ a: this.state.a + int });
-    const bumpB = (int) => () => this.setState({ b: this.state.b + int });
-
-    return (
-      <div>
-        {label}
-        <Controls bumpA={bumpA} bumpB={bumpB} />
-      </div>
-    )
-  }
-}
-
-```
+Reduce the potential energy of your React components. Write your state logic declaratively to better reason about how a component behaves with different combinations of props and state.
 
 With photonic
 ```jsx
@@ -120,7 +71,52 @@ class EnumPartitioned extends React.Component {
 }
 ```
 
+Without photonic
+```jsx
+import React from 'react';
+
+import { Negative, Zero, Even, Odd, Controls } from 'some/magical/place';
+
+class EnumClassic extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      a: 0,
+      b: 0
+    }
+  }
+
+  render() {
+    const { a, b } = this.state;
+    let label;
+
+    if (a + b < 0) {
+      label = <Negative value={a + b} />;
+    } else if (a + b === 0) {
+      label = <Zero />
+    } else if ((a + b) % 2 === 0) {
+      label = <Even />;
+    } else {
+      label = <Odd />;
+    }
+
+    const bumpA = (int) => () => this.setState({ a: this.state.a + int });
+    const bumpB = (int) => () => this.setState({ b: this.state.b + int });
+
+    return (
+      <div>
+        {label}
+        <Controls bumpA={bumpA} bumpB={bumpB} />
+      </div>
+    )
+  }
+}
+
+```
+
+
 Log state transitions for class based components:
+For example, the below will print `Zero --> Negative`, `Even --> Odd`, etc, if used witht he component above.
 ```jsx
 import React from 'react';
 import { log }, partitionOn from 'photonic';
@@ -136,3 +132,13 @@ class MyComponent extends React.Component {
   }
 }
 ```
+
+Benefits:
+* Quickly see the possible states your component can be rendered in.
+* See what pieces of props abd state are required to render each state.
+* Stop using if/else or switch control statements.  Instead, declaratively write how to handle each state of your component.
+* Automaticly detect and handle bad states.
+
+Cons
+* You must explicitly write your states which may take more code.
+*
