@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import partitionOn from '../../react-partition';
+import partitionOn from '../../index.jsx';
 
 const Loading = () => <span>Loading...</span>;
 const Loaded = () => <span>Loaded!</span>;

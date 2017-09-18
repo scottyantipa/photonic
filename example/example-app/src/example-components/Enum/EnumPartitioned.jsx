@@ -1,5 +1,5 @@
 import React from 'react';
-import partitionOn from '../../react-partition';
+import partitionOn from '../../index.jsx';
 
 import { Negative, Zero, Even, Odd, Controls } from './BaseComponents';
 

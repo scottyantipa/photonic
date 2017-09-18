@@ -1,4 +1,4 @@
-# react-partition
+# photonic
 
 Partition your React components based on the props and state required to render each piece.
 
@@ -8,7 +8,7 @@ Benefits:
 * No more if/else or switch control statements.  Instead, declaratively define the states of your component and how it looks in each.
 * Get console warnings when your component gets in an unintended state
 
-Without react-partition
+Without photonic
 ```jsx
 import React from 'react';
 
@@ -51,10 +51,10 @@ class EnumClassic extends React.Component {
 
 ```
 
-With react-partition
+With photonic
 ```jsx
 import React from 'react';
-import partitionOn from 'react-partition';
+import partitionOn from 'photonic';
 
 import { Negative, Zero, Even, Odd, Controls } from 'some/magical/place';
 
@@ -123,7 +123,7 @@ class EnumPartitioned extends React.Component {
 Log state transitions for class based components:
 ```jsx
 import React from 'react';
-import { log }, partitionOn from 'react-partition';
+import { log }, partitionOn from 'photonic';
 
 class MyComponent extends React.Component {
   shouldComponentUpdate(newProps, newState) {

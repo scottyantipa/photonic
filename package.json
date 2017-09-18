@@ -1,12 +1,12 @@
 {
-  "name": "react-partition",
+  "name": "photonic",
   "version": "0.0.1",
-  "description": "Partition your React components based on props and state",
-  "main": "react-partition.jsx",
+  "description": "Reduce the potential energy of your React components",
+  "main": "index.jsx",
   "author": "Scott Antipa",
   "license": "MIT",
   "private": false,
   "dependencies": {
-    "react": "^14.0.0"
+    "react": "^15.0.0"
   }
 }
