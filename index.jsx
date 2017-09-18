@@ -26,7 +26,7 @@ const activePartition = (oneOrEnum, position) => {
 
   if (Array.isArray(oneOrEnum)) {
     partition = processEnum(oneOrEnum, position);
-    if (!partition) console.warn('Could not find partition in set: ', oneOrEnum, ' for: ', position);
+    if (!partition) console.warn('Could not find partition for this state.');
   } else {
     if (oneOrEnum.when(position)) {
       partition = oneOrEnum;
