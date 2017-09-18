@@ -1,23 +1,23 @@
 import React from 'react';
 
-// import SFCClassic from './example-components/SimpleSFC/Classic';
-// import SFCPartitioned from './example-components/SimpleSFC/Partitioned';
+import SFCClassic from './example-components/SimpleSFC/Classic';
+import SFCPartitioned from './example-components/SimpleSFC/Partitioned';
 
-import EnumClassic from './example-components/Enum/EnumClassic';
-import EnumPartitioned from './example-components/Enum/EnumPartitioned';
+// import EnumClassic from './example-components/Enum/EnumClassic';
+// import EnumPartitioned from './example-components/Enum/EnumPartitioned';
 
 const App = () =>
   <div className="application">
     <div>
       <h5>Partitioned</h5>
       <Card>
-        <EnumPartitioned />
+        <SFCPartitioned isLoading />
       </Card>
     </div>
     <div>
       <h5>Classic</h5>
       <Card>
-        <EnumClassic />
+        <SFCClassic isLoading />
       </Card>
     </div>
   </div>;
