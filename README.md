@@ -140,5 +140,4 @@ Benefits:
 * Automaticly detect and handle bad states.
 
 Cons
-* You must explicitly write your states which may take more code.
-*
+* You must explicitly write your states, which may take more code.
