@@ -5,16 +5,18 @@ const getDisplayName = (reactComponent) => {
 };
 
 const render = (partition, position) => {
-  const { withProps, show } = partition;
-  const Comp = show;
-  const props = withProps(position);
+  const { withProps, show: Comp } = partition;
+  const props = typeof withProps === 'function' ?
+    withProps(position) : (withProps || {});
   return <Comp {...props} />;
 };
 
 const processEnum = (partitions, position) => {
   for (let idx in partitions) {
     const partition = partitions[idx];
-    if (partition.when(position)) {
+    const when = partition.when;
+    const isFunc = typeof when === 'function';
+    if (isFunc ? when(position) : when) {
       return partition;
     }
   }
@@ -28,7 +30,9 @@ const activePartition = (oneOrEnum, position) => {
     partition = processEnum(oneOrEnum, position);
     if (!partition) console.warn('Could not find partition for this state.');
   } else {
-    if (oneOrEnum.when(position)) {
+    const when = oneOrEnum.when;
+    const isFunc = typeof when === 'function';
+    if (isFunc ? when(position) : when) {
       partition = oneOrEnum;
     }
   }
@@ -50,7 +54,7 @@ const log = (partition, position0, position1) => {
 const partitionOn = (oneOrEnum) => {
   return (position) => {
     const partition = activePartition(oneOrEnum, position);
-    return partition ? render(partition, position) : undefined;
+    return partition ? render(partition, position) : null;
   };
 };
 

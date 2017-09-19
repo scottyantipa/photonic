@@ -8,12 +8,10 @@ const hasError = (props) => Boolean(props.errorStr);
 const part = partitionOn([
   {
     show: Loading,
-    withProps: ({ props }) => ({}),
     when: ({ props }) => props.isLoading
   },
   {
     show: Loaded,
-    withProps: ({ props }) => ({}),
     when: ({ props }) => !props.isLoading && !hasError(props)
   },
   {

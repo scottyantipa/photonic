@@ -1,5 +1,5 @@
 import React from 'react';
-import partitionOn from '../../index.jsx';
+import partitionOn, { log } from '../../index.jsx';
 
 import { Negative, Zero, Even, Odd, Controls } from './BaseComponents';
 
@@ -11,12 +11,10 @@ const labelPartitions = [
   },
   {
     show: Zero,
-    withProps: () => ({}),
     when: ({ state }) => (state.a + state.b) === 0
   },
   {
     show: Even,
-    withProps: () => ({}),
     when: ({ state }) => {
       const { a, b } = state;
       return (a + b > 0) && ((a + b) % 2 === 0);
@@ -24,7 +22,6 @@ const labelPartitions = [
   },
   {
     show: Odd,
-    withProps: () => ({}),
     when: ({ state }) => {
       const { a, b } = state;
       return (a + b > 0) && ((a + b) % 2 === 1);
@@ -41,7 +38,7 @@ const partControl = partitionOn({
     const bumpB = (int) => () => self.setState({ b: state.b + int });
     return { bumpA, bumpB };
   },
-  when: () => true
+  when: true
 });
 
 class EnumPartitioned extends React.Component {
@@ -51,6 +48,15 @@ class EnumPartitioned extends React.Component {
       a: 0,
       b: 0
     };
+  }
+
+  shouldComponentUpdate(newProps, newState) {
+    log(
+      labelPartitions,
+      { props: this.props, state: this.state, self: this },
+      { props: newProps, state: newState, self: this }
+    );
+    return true;
   }
 
   render() {
