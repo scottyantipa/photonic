@@ -114,25 +114,6 @@ class EnumClassic extends React.Component {
 
 ```
 
-
-Log state transitions for class based components:
-For example, the below will print `Zero --> Negative`, `Even --> Odd`, etc, if used with the component above.
-```jsx
-import React from 'react';
-import { log }, partitionOn from 'photonic';
-
-class MyComponent extends React.Component {
-  shouldComponentUpdate(newProps, newState) {
-    log(
-      labelPartitions,
-      { props: this.props, state: this.state, self: this },
-      { props: newProps, state: newState, self: this }
-    );
-    return true;
-  }
-}
-```
-
 Benefits:
 * Quickly see the possible states your component can be rendered in.
 * See what pieces of props abd state are required to render each state.
