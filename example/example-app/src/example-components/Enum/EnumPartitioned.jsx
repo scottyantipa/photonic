@@ -31,15 +31,17 @@ const labelPartitions = [
 
 const partLabel = partitionOn(labelPartitions);
 
-const partControl = partitionOn({
-  show: Controls,
-  withProps: ({ state, self }) => {
-    const bumpA = (int) => () => self.setState({ a: state.a + int });
-    const bumpB = (int) => () => self.setState({ b: state.b + int });
-    return { bumpA, bumpB };
-  },
-  when: true
-});
+const partControl = partitionOn([
+  {
+    show: Controls,
+    withProps: ({ state, self }) => {
+      const bumpA = (int) => () => self.setState({ a: state.a + int });
+      const bumpB = (int) => () => self.setState({ b: state.b + int });
+      return { bumpA, bumpB };
+    },
+    when: true
+}
+]);
 
 class EnumPartitioned extends React.Component {
   constructor() {
