@@ -7,27 +7,35 @@ const render = (partition, position) => {
   return <Comp {...props} />;
 };
 
-const findActive = (partitions, position) => {
-  for (let idx in partitions) {
-    const partition = partitions[idx];
-    const when = partition.when;
-    const isFunc = typeof when === 'function';
-    if (isFunc ? when(position) : when) {
-      return partition;
-    }
+const isActive = (partition, position) => {
+  const { when } = partition;
+  const isFunc = typeof when === 'function';
+  return isFunc ? when(position) : when;
+}
+
+const allActive = (partitions, position) => {
+  return partitions.map((_p, i) => i)
+                   .filter(i => isActive(partitions[i], position));
+}
+
+const renderActive = (partitions, position) => {
+  const indices = allActive(partitions, position);
+  const renderFirst = () => render(partitions[indices[0]], position);
+  switch (indices.length) {
+    case 0:
+      console.warn('Could not find partition for this state.')
+      return null;
+    case 1:
+      return renderFirst();
+    default:
+      console.warn("Multiple indices active. Defaulting to first. ", indices);
+      return renderFirst();
   }
-  return undefined;
 }
 
 const partitionOn = (partitions) => {
   return (position) => {
-    const partition = findActive(partitions, position);
-    if (partition) {
-      return render(partition, position);
-    } else {
-      console.warn('Could not find partition for this state.')
-      return null;
-    }
+    return renderActive(partitions, position);
   };
 };
 
