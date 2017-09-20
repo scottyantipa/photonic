@@ -1,5 +1,11 @@
 import React from 'react';
 
+const getDisplayName = (Comp) => {
+  return Comp.displayName
+    || Comp.name
+    || 'Unknown'
+};
+
 const render = (partition, position) => {
   const { withProps, show: Comp } = partition;
   const props = typeof withProps === 'function' ?
@@ -20,17 +26,21 @@ const allActive = (partitions, position) => {
 
 const renderActive = (partitions, position) => {
   const indices = allActive(partitions, position);
-  const renderFirst = () => render(partitions[indices[0]], position);
-  switch (indices.length) {
-    case 0:
-      console.warn('Could not find partition for this state.')
-      return null;
-    case 1:
-      return renderFirst();
-    default:
-      console.warn("Multiple indices active. Defaulting to first. ", indices);
-      return renderFirst();
+  const active = indices.length > 0 ? partitions[indices[0]] : undefined;
+
+  if (indices.length === 0) {
+    console.warn('Could not find partition for position: ', position);
+  } else if (indices.length > 1) {
+    console.group();
+    console.warn("More than one 'when' function returned true. Defaulting to the first.");
+    indices.forEach((i) => {
+      const Comp = partitions[i].show;
+      console.log(`${i} ${getDisplayName(Comp)}`);
+    });
+    console.groupEnd();
   }
+
+  return active ? render(active, position) : null;
 }
 
 const partitionOn = (partitions) => {

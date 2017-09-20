@@ -3,7 +3,7 @@ import partitionOn from '../../index.jsx';
 
 import { Negative, Zero, Even, Odd, Controls } from './BaseComponents';
 
-const labelPartitions = [
+const partLabel = partitionOn([
   {
     show: Negative,
     withProps: ({ state }) => ({ value: state.a + state.b }),
@@ -27,9 +27,7 @@ const labelPartitions = [
       return (a + b > 0) && ((a + b) % 2 === 1);
     }
   }
-];
-
-const partLabel = partitionOn(labelPartitions);
+]);
 
 const partControl = partitionOn([
   {
@@ -39,7 +37,7 @@ const partControl = partitionOn([
       const bumpB = (int) => () => self.setState({ b: state.b + int });
       return { bumpA, bumpB };
     },
-    when: true
+    when: true // always show it
 }
 ]);
 
