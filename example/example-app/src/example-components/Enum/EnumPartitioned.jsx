@@ -1,9 +1,9 @@
 import React from 'react';
-import partitionOn from '../../index.jsx';
+import { reduce } from '../../index.jsx';
 
 import { Negative, Zero, Even, Odd, Controls } from './BaseComponents';
 
-const partLabel = partitionOn([
+const partitions = [
   {
     show: Negative,
     withProps: ({ state }) => ({ value: state.a + state.b }),
@@ -27,19 +27,19 @@ const partLabel = partitionOn([
       return (a + b > 0) && ((a + b) % 2 === 1);
     }
   }
-]);
+];
 
-const partControl = partitionOn([
+const controlPartition = [
   {
+    when: true, // always show it
     show: Controls,
     withProps: ({ state, self }) => {
       const bumpA = (int) => () => self.setState({ a: state.a + int });
       const bumpB = (int) => () => self.setState({ b: state.b + int });
       return { bumpA, bumpB };
-    },
-    when: true // always show it
-}
-]);
+    }
+  }
+];
 
 class EnumPartitioned extends React.Component {
   constructor() {
@@ -55,8 +55,8 @@ class EnumPartitioned extends React.Component {
 
     return (
       <div>
-        {partLabel(position)}
-        {partControl(position)}
+        {reduce(partitions, position)}
+        {reduce(controlPartition, position)}
       </div>
     );
   }

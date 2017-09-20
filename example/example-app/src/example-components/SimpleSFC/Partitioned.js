@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
-import partitionOn from '../../index.jsx';
+import { reduce } from '../../index.jsx';
 
 import { Loading, Error, Loaded } from './BaseComponents';
 
 const hasError = (props) => Boolean(props.errorStr);
 
-const part = partitionOn([
+const partitions = [
   {
     show: Loading,
     when: ({ props }) => props.isLoading
@@ -19,10 +19,10 @@ const part = partitionOn([
     withProps: ({ props }) => ({ str: props.errorStr}),
     when: ({ props }) => hasError(props)
   }
-]);
+];
 
 const DataLoading = (props) => {
-  return part({ props });
+  return reduce(partitions, { props });
 };
 
 DataLoading.propTypes = {

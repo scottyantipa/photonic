@@ -24,7 +24,7 @@ const allActive = (partitions, position) => {
                    .filter(i => isActive(partitions[i], position));
 }
 
-const renderActive = (partitions, position) => {
+const reduce = (partitions, position) => {
   const indices = allActive(partitions, position);
   const active = indices.length > 0 ? partitions[indices[0]] : undefined;
 
@@ -43,10 +43,4 @@ const renderActive = (partitions, position) => {
   return active ? render(active, position) : null;
 }
 
-const partitionOn = (partitions) => {
-  return (position) => {
-    return renderActive(partitions, position);
-  };
-};
-
-export default partitionOn;
+export { reduce };

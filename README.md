@@ -5,11 +5,11 @@ Reduce the potential energy of your React components. Write your state logic dec
 With photonic
 ```jsx
 import React from 'react';
-import partitionOn from 'photonic';
+import { reduce } from 'photonic';
 
 import { Negative, Zero, Even, Odd, Controls } from 'some/magical/place';
 
-const partLabel = partitionOn([
+const partitions = [
   {
     show: Negative,
     withProps: ({ state }) => ({ value: state.a + state.b }),
@@ -17,12 +17,10 @@ const partLabel = partitionOn([
   },
   {
     show: Zero,
-    withProps: () => ({}),
     when: ({ state }) => (state.a + state.b) === 0
   },
   {
     show: Even,
-    withProps: () => ({}),
     when: ({ state }) => {
       const { a, b } = state;
       return (a + b > 0) && ((a + b) % 2 === 0);
@@ -30,23 +28,24 @@ const partLabel = partitionOn([
   },
   {
     show: Odd,
-    withProps: () => ({}),
     when: ({ state }) => {
       const { a, b } = state;
       return (a + b > 0) && ((a + b) % 2 === 1);
     }
   }
-]);
+];
 
-const partControl = partitionOn({
-  show: Controls,
-  withProps: ({ state, self }) => {
-    const bumpA = (int) => () => self.setState({ a: state.a + int });
-    const bumpB = (int) => () => self.setState({ b: state.b + int });
-    return { bumpA, bumpB };
-  },
-  when: () => true
-});
+const controlPartition = [
+  {
+    when: true, // always show it
+    show: Controls,
+    withProps: ({ state, self }) => {
+      const bumpA = (int) => () => self.setState({ a: state.a + int });
+      const bumpB = (int) => () => self.setState({ b: state.b + int });
+      return { bumpA, bumpB };
+    }
+  }
+];
 
 class EnumPartitioned extends React.Component {
   constructor() {
@@ -57,14 +56,13 @@ class EnumPartitioned extends React.Component {
     };
   }
 
-
   render() {
     const position = { props: this.props, state: this.state, self: this };
 
     return (
       <div>
-        {partLabel(position)}
-        {partControl(position)}
+        {reduce(partitions, position)}
+        {reduce(controlPartition, position)}
       </div>
     );
   }
