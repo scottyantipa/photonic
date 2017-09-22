@@ -1,73 +1,77 @@
 # Photonic
 
 Reduce the potential energy of your React components.
-Write your state logic declaratively to better reason about how a component behaves in different states.
+Conditionally render components in a declarative fashion.
+
+# Syntax
+
+A partition is an object that inspects the current props/state and determines if it should render.
+```
+{
+  show:      a React component
+  withProps: the props to pass to `show`.  This can be undefined, an object, or a function of props/state that returns an object
+  when:      boolean or or a function of props/state that returns a boolean
+}
+```
+
+Photonic inspects an array of partitions and determines which one to render.
+If `when` is truthy, then `show` will be rendered with the results of `withProps`.
+
+In dev mode, if multiple partitions are truthy then Photonic will throw a warning. In production it uses the first match to save on perf.
+This means that partitions are order *independent*.  I.e. each `when` must independently determine if the partition is active.  This helps you to identify when states are actually independent or if they can be combined into a single state.
 
 # Example
 
-Here's an example of a component that uses Photonic and has, conceptually, 5 different states.
 ```js
 import React from 'react';
 import { reduce } from 'photonic';
 
-import { Negative, Zero, Even, Odd, Controls } from 'some/magical/place';
+// The 3 states
+const Error   = ({ errorStr }) => <div>{errorStr}</div>;
+const Loading = () => <div>Loading...</div>;
+const User    = ({ user }) => <div>{user.name}</div>;
 
-/*
-Define your partitions.
-
-A partition is an object that inspects the current props/state and determines if it should render.
-{
-  show:      A React component
-  withProps: The props to pass to `show`.  This can be undefined or an object or a function of props/state that returns an object
-  when:      Boolean or Function returning a Boolean.  
-}
-
-If `when` is truthy, then `show` will be rendered with the results of `withProps`.
-In dev mode, if multiple partitions are truthy then Photonic will throw a warning. In production it uses the first match to save on perf.
-
-Partitions are order *independent*.  I.e. each `when` must independently determine if the partition is active.
-*/
+// Define the partitions
 const partitions = [
   {
-    show: Negative,
-    withProps: ({ state }) => ({ value: state.a + state.b }), // only depends on state to render
-    when: ({ state }) => (state.a + state.b < 0) // only needs state to determine if it is active
+    show: Error,
+    when: ({ state }) => !state.loading && state.fetchFailed, // we can immediately see that this condition only depends on state
+    withProps: ({ props }) => ({ errorStr: props.errorStr }) // and this partition only depends on props to render
   },
   {
-    show: Zero,
-    when: ({ state }) => (state.a + state.b) === 0
-    withProps: ({ props }) => ({ message: props.zeroMessage }) // only requires props to render
+    show: Loading, // if no props are needed you can omit withProps
+    when: ({ state }) => !state.user && state.fetching
   },
   {
-    // Even doesn't require props to render so we leave withProps undefined
-    show: Even,
-    when: ({ state }) => {
-      const { a, b } = state;
-      return (a + b > 0) && ((a + b) % 2 === 0);
-    }
-  },
-  {
-    show: Odd,
-    when: ({ state }) => {
-      const { a, b } = state;
-      return (a + b > 0) && ((a + b) % 2 === 1);
-    }
+    show: User,
+    when: ({ state }) => Boolean(state.user),
+    withProps: ({ state }) => ({ user: state.user })
   }
 ];
 
-class EnumPartitioned extends React.Component {
+class UserPage extends React.Component {
   constructor() {
     super();
     this.state = {
-      a: 1,
-      b: 0
+      user: undefined,
+      fetching: false,
+      fetchFailed: false
     };
   }
 
-  // Call `reduce` with the current component props & state and let Photonic determine which partition to render.
+  componentWillMount() {
+    this.setState({ fetching: true });
+    fetchUser()
+      .then(user => this.setState({ user, fetchFailed: false }))
+      .fail(() => this.setState({ fetchFailed: true }))
+      .always(() => this.setState({ fetching: false }));
+  }
+
+  // Call `reduce` with the current props & state.  Photonic will render the correct partition.
   // Note that this does not need jsx to render
   render() {
-    const position = { props: this.props, state: this.state, self: this };
+    const { props, state } = this;
+    const position = { props, state };
     return reduce(partitions, position);
   }
 }
