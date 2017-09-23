@@ -2,3 +2,4 @@ example/example-app/src/index.jsx
 node_modules/
 .DS_Store
 yarn-error.log
+dist
