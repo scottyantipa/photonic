@@ -1,6 +1,6 @@
 {
   "name": "photonic",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Reduce the potential energy of your React components",
   "main": "dist/photonic.js",
   "scripts": {
