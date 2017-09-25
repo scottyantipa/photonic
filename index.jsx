@@ -43,4 +43,8 @@ const reduce = (partitions, position) => {
   return active ? render(active, position) : null;
 }
 
-export { reduce };
+const sfc = (partitions) => {
+  return (props) => reduce(partitions, { props });
+}
+
+export { reduce, sfc };
