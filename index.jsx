@@ -1,6 +1,8 @@
 import React from 'react';
 
 const getDisplayName = (Comp) => {
+  if (!Comp) return 'UndefinedComp';
+
   return Comp.displayName
     || Comp.name
     || 'Unknown'
@@ -43,8 +45,16 @@ const reduce = (partitions, position) => {
   return active ? render(active, position) : null;
 }
 
-const sfc = (partitions) => {
-  return (props) => reduce(partitions, { props });
+const stateful = (instance, partitions) => {
+  return () => reduce(partitions, { props: instance.props, state: instance.state, self: instance })
 }
 
-export { reduce, sfc };
+const sfc = (partitions, name) => {
+  const PhotonicSFC = (props) => reduce(partitions, { props });
+  if (name) {
+    PhotonicSFC.displayName = name;
+  }
+  return PhotonicSFC;
+}
+
+export { reduce, sfc, stateful };
