@@ -21,27 +21,45 @@ const isActive = (partition, position) => {
   return isFunc ? when(position) : when;
 }
 
+const firstActive = (partitions, position) => {
+  for (const partition of partitions) {
+    if (isActive(partition, position)) {
+      return partition;
+    }
+  }
+  return undefined;
+}
+
 const allActive = (partitions, position) => {
-  return partitions.map((_p, i) => i)
-                   .filter(i => isActive(partitions[i], position));
+  return partitions.filter(p => isActive(p, position));
 }
 
 const reduce = (partitions, position) => {
-  const indices = allActive(partitions, position);
-  const active = indices.length > 0 ? partitions[indices[0]] : undefined;
+  const reducer = process.env.NODE_ENV === 'production' ? reduceProd : reduceDev;
+  return reducer(partitions, position);
+}
 
-  if (indices.length === 0) {
+const reduceProd = (partitions, position) => {
+  const active = firstActive(partitions, position);
+  return active ? render(active, position) : null;
+}
+
+const reduceDev = (partitions, position) => {
+  const all = allActive(partitions, position)
+
+  if (all.length === 0) {
     console.warn('Could not find partition for position: ', position);
-  } else if (indices.length > 1) {
+  } else if (all.length > 1) {
     console.group();
     console.warn("More than one 'when' function returned true. Defaulting to the first.");
-    indices.forEach((i) => {
-      const Comp = partitions[i].show;
+    all.forEach((partition, i) => {
+      const Comp = partition.show;
       console.log(`${i} ${getDisplayName(Comp)}`);
     });
     console.groupEnd();
   }
 
+  const active = all[0];
   return active ? render(active, position) : null;
 }
 
