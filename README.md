@@ -1,9 +1,8 @@
 # Photonic
 
-###### Declarative conditional rendering for React.
-A complex component will render different things depending on its current state. Photonic lets you describe those states in a declarative way -- an array of rules. It then does the work of rendering the state that is currently active.
+##### Declarative conditional rendering for React.
 
-## Examples
+## Example
 
 A stateful UserPage that fetches and renders data about a user.
 ```js
@@ -15,12 +14,17 @@ const User        = ({ user }) => <div>{user.name}</div>;
 const Fetching    = () => <div>Fetching...</div>;
 const FetchFailed = ({ errorStr }) => <div>{errorStr}</div>;
 
-// Photonic uses these partitions to determine which state to render.
+/*
+  On each render, Photonic will find the currently active partition
+  and render it. For example, the first partition below
+  says that when state.user is truthy, render User
+  with the props { user: state.user }.
+*/
 const partitions = [
   {
     show: User,
-    when: ({ state }) => Boolean(state.user),
-    withProps: ({ state }) => ({ user: state.user })
+    withProps: ({ state }) => ({ user: state.user }),
+    when: ({ state }) => Boolean(state.user)
   },
   {
     show: Fetching,
@@ -28,8 +32,8 @@ const partitions = [
   }
   {
     show: FetchFailed,
-    when: ({ state }) => !state.loading && state.fetchFailed,
-    withProps: ({ props }) => ({ errorStr: props.errorStr })
+    withProps: ({ props }) => ({ errorStr: props.errorStr }),
+    when: ({ state }) => !state.loading && state.fetchFailed
   }
 ];
 
@@ -46,9 +50,8 @@ class UserPage extends React.Component {
   componentWillMount() {
     this.setState({ fetching: true });
     fetchUser()
-      .then(user => this.setState({ user, fetchFailed: false }))
-      .fail(() => this.setState({ fetchFailed: true }))
-      .always(() => this.setState({ fetching: false }));
+      .then(user => this.setState({ user, fetchFailed: false, fetching: false }))
+      .fail(() => this.setState({ fetchFailed: true, fetching: false }));
   }
 
   // Call the function returned by `stateful`. It will determine which partition
@@ -98,7 +101,24 @@ These are the possible values for each key:
 }
 ```
 
-Photonic uses *order independent* matching to determine which partition is active. This means that you cannot assume that the first partition returned false when you are writing the condition for the second partition. I.e. each `when` must independently determine if the partition is active. This helps you to identify when states are actually independent or if they can be combined into a single state.
+Photonic uses *order independent* matching to determine which partition is active. This means that you cannot assume that the first partition returned false when you are writing the condition for the second partition. I.e. each `when` condition must independently determine if the partition is active. This helps you to identify when states are actually independent or if they can be combined into a single state.
+```js
+const partitions = [
+  {
+    show: Foo,
+    when: ({ state }) => state.a
+  },
+  {
+    show: Bar,
+    when: ({ state }) => {
+      // This condition cannot assume that it is run after the
+      // `when` condition from Foo just because it comes after it in this array.
+      // e.g. it cannot assume that `state.a` is false.
+      return !state.a;
+    }
+  }
+]
+```
 
 In development mode, if multiple partitions are truthy then Photonic will throw a warning. In production it uses the first match for better performance.
 
@@ -121,15 +141,6 @@ import { sfc } from 'photonic';
 const partitions = [/*...*/];
 const MySFC = sfc(partitions);
 ```
-
-## Why Photonic?
-A big render function, with if/elses and switches, is hard to reason about. It also causes your program to have high "potential energy" -- all of the possible things that your program can do before it completes.  Photonic helps you to reduce this complexity by jumping your program's execution from the top of the render function directly into a single partition. Declaring states in a data structure, rather than with control statements, will reduce bugs and better express the intent of the component.
-
-Benefits:
-* Quickly see the possible states your component can be rendered in.
-* Stop using if/else or switch control statements.  Instead, declaratively write how to handle each state of your component.
-* See what parts of props and state are required to render each state.
-* Automaticly detect and handle bad states.
 
 ## Detecting overlapping partitions
 If you accidentally write overlapping partitions (i.e. multiple return true for some state) then Photonic will throw a warning in the console (in dev mode only). For example, both Foo and Bar will be active if state.a < 10.
