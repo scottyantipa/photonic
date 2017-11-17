@@ -2,9 +2,14 @@
 
 ##### Declarative conditional rendering for React.
 
+## Install
+```
+npm install --save photonic
+```
+
 ## Example
 
-A stateful UserPage that fetches and renders data about a user.
+A stateful component called UserPage that fetches and renders data about a user.
 ```js
 import React from 'react';
 import { stateful } from 'photonic';
