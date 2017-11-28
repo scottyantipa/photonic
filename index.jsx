@@ -8,67 +8,76 @@ const getDisplayName = (Comp) => {
     || 'Unknown'
 };
 
-const render = (partition, position) => {
-  const { withProps, show: Comp } = partition;
+const render = (node, position) => {
+  const { withProps, show } = node;
   const props = typeof withProps === 'function' ?
     withProps(position) : (withProps || {});
+  const Comp = show;
   return <Comp {...props} />;
+}
+
+const evalNode = (node, position) => {
+  if (Array.isArray(node.show)) {
+    return reduce(node.show, position)
+  } else {
+    return render(node, position);
+  }
 };
 
-const isActive = (partition, position) => {
-  const { when } = partition;
+const isActive = (node, position) => {
+  const { when } = node;
   const isFunc = typeof when === 'function';
   return isFunc ? when(position) : when;
 }
 
-const firstActive = (partitions, position) => {
-  for (const partition of partitions) {
-    if (isActive(partition, position)) {
-      return partition;
+const firstActive = (tree, position) => {
+  for (const node of tree) {
+    if (isActive(node, position)) {
+      return node;
     }
   }
   return undefined;
 }
 
-const allActive = (partitions, position) => {
-  return partitions.filter(p => isActive(p, position));
+const allActive = (tree, position) => {
+  return tree.filter(p => isActive(p, position));
 }
 
-const reduce = (partitions, position) => {
+const reduce = (tree, position) => {
   const reducer = process.env.NODE_ENV === 'production' ? reduceProd : reduceDev;
-  return reducer(partitions, position);
+  return reducer(tree, position);
 }
 
-const reduceProd = (partitions, position) => {
-  const active = firstActive(partitions, position);
-  return active ? render(active, position) : null;
+const reduceProd = (tree, position) => {
+  const active = firstActive(tree, position);
+  return active ? evalNode(active, position) : null;
 }
 
-const reduceDev = (partitions, position) => {
-  const all = allActive(partitions, position)
+const reduceDev = (tree, position) => {
+  const all = allActive(tree, position)
 
   if (all.length === 0) {
-    console.warn('Could not find partition for position: ', position);
+    console.warn('Could not find node for position: ', position);
   } else if (all.length > 1) {
     console.group();
     console.warn("More than one 'when' function returned true. Defaulting to the first.");
-    all.forEach((partition, i) => {
-      const Comp = partition.show;
+    all.forEach((node, i) => {
+      const Comp = node.show;
       console.log(`${i} ${getDisplayName(Comp)}`);
     });
     console.groupEnd();
   }
 
   const active = all[0];
-  return active ? render(active, position) : null;
+  return active ? evalNode(active, position) : null;
 }
 
-const stateful = (instance, partitions) => {
-  return () => reduce(partitions, { props: instance.props, state: instance.state, self: instance })
+const stateful = (instance, tree) => {
+  return () => reduce(tree, { props: instance.props, state: instance.state, self: instance })
 }
 
-const sfc = (partitions, name) => {
-  const PhotonicSFC = (props) => reduce(partitions, { props });
+const sfc = (tree, name) => {
+  const PhotonicSFC = (props) => reduce(tree, { props });
   if (name) {
     PhotonicSFC.displayName = name;
   }

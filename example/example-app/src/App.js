@@ -9,7 +9,7 @@ import EnumPartitioned from './example-components/Enum/EnumPartitioned';
 const App = () =>
   <div className="application">
     <div>
-      <h5>Partitioned</h5>
+      <h5>Photonicized</h5>
       <Card>
         <EnumPartitioned />
       </Card>

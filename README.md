@@ -1,6 +1,6 @@
 # Photonic
 
-##### Declarative conditional rendering for React.
+##### Conditional rendering in React using decision trees
 
 ## Install
 ```
@@ -20,38 +20,40 @@ const Fetching    = () => <div>Fetching...</div>;
 const FetchFailed = ({ errorStr }) => <div>{errorStr}</div>;
 
 /*
-  On each render, Photonic will find the currently active partition
-  and render it. For example, the first partition below
-  says that when state.user is truthy, render User
-  with the props { user: state.user }.
+  On each render, Photonic will find the currently active node
+  in the decision tree and render it. For example, the tree below
+  has the following rules:
+  - The first decision point has two branches: one for when state.user exists
+    and one for when it is undefined.
+  - When the user exists, just show the User component.
+  - The undefined branch further splits into two branches:
+    - Show 'Fetching' when there's no data and we're fetching the user from
+      the server.
+    - Show FetchFailed when there was an error fetching the data
 */
-const partitions = [
+const tree = [
   {
     show: User,
     withProps: ({ state }) => ({ user: state.user }),
-    when: ({ state }) => Boolean(state.user)
+    when: ({ state }) => state.user !== undefined
   },
   {
-    show: Fetching,
-    when: ({ state }) => !state.user && state.fetching
-  }
-  {
-    show: FetchFailed,
-    withProps: ({ props }) => ({ errorStr: props.errorStr }),
-    when: ({ state }) => !state.loading && state.fetchFailed
+    when: ({ state }) => state.user === undefined,
+    show: [
+      {
+        show: Fetching,
+        when: ({ state }) => state.fetching
+      },
+      {
+        show: FetchFailed,
+        withProps: ({ props }) => ({ errorStr: props.errorStr }),
+        when: ({ state }) => !state.loading && state.fetchFailed
+      }    
+    ]
   }
 ];
 
 class UserPage extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      user: undefined,
-      fetching: false,
-      fetchFailed: false
-    };
-  }
-
   componentWillMount() {
     this.setState({ fetching: true });
     fetchUser()
@@ -59,14 +61,49 @@ class UserPage extends React.Component {
       .fail(() => this.setState({ fetchFailed: true, fetching: false }));
   }
 
-  // Call the function returned by `stateful`. It will determine which partition
-  // is currently active and render it.
   render() {
-    return stateful(this, partitions)();
+    return stateful(this, tree)();
   }
 }
 ```
 
+## API
+
+### nodes
+A node is an object that describes a decision point in the decision tree.
+```
+{
+  show:      a React component (for leaf nodes) or another tree
+  withProps: props to pass to `show` (for leaf nodes)
+  when:      boolean condition
+}
+```
+You can think of the keys as a little story: Render `show` with the props `withProps` if `when` is true.
+
+These are the possible values for each key:
+```
+{
+  show:      React component
+  withProps: object | function returning object | undefined
+  when:      boolean | function returning boolean
+}
+```
+
+In dev mode, Photonic will check the `when` condition for all branches out of a node. If multiple branches from one node are active then Photonic will throw a warning to let the developer know that the branches are not exclusive. In production, it picks the first active branch and returns for better performance..
+
+### stateful
+Call this function with your component instance and a decision tree. It will render the active node.
+```js
+import { stateful } from 'photonic';
+const tree = [/*...*/];
+class ImStateful extends React.Component {
+  render() {
+    return stateful(this, tree);
+  }
+}
+```
+
+### sfc
 You can also define stateless functional components.
 ```js
 import React from 'react';
@@ -84,31 +121,9 @@ export const FooOrBar = sfc([
 ]);
 ```
 
-## API
-
-### partitions
-A partition is an object that describes one particular state of your component.
-```
-{
-  show:      a React component
-  withProps: props to pass to `show`
-  when:      condition
-}
-```
-You can think of the keys as a little story: Render `show` with the props `withProps` if `when` is true.
-
-These are the possible values for each key:
-```
-{
-  show:      React component
-  withProps: object | function returning object | undefined
-  when:      boolean | function returning boolean
-}
-```
-
-Photonic uses *order independent* matching to determine which partition is active. This means that you cannot assume that the first partition returned false when you are writing the condition for the second partition. I.e. each `when` condition must independently determine if the partition is active. This helps you to identify when states are actually independent or if they can be combined into a single state.
+Photonic uses *order independent* matching to determine which node is active. This means that you cannot assume that the first branch returned false when you are writing the condition for the second branch for a given node. I.e. each `when` condition must independently determine if the branch is active. This helps you to identify when states are actually independent or if they can be combined into a single state.
 ```js
-const partitions = [
+const tree = [
   {
     show: Foo,
     when: ({ state }) => state.a
@@ -125,32 +140,10 @@ const partitions = [
 ]
 ```
 
-In development mode, if multiple partitions are truthy then Photonic will throw a warning. In production it uses the first match for better performance.
-
-### stateful
-Call this function with your component instance and its partitions. It will render the active partition.
+## Detecting overlapping branches
+If you accidentally write overlapping branches (i.e. multiple return true for some state) then Photonic will throw a warning in the console (in dev mode only). For example, both Foo and Bar will be active if state.a < 10.
 ```js
-import { stateful } from 'photonic';
-const partitions = [/*...*/];
-class ImStateful extends React.Component {
-  render() {
-    return stateful(this, partitions);
-  }
-}
-```
-
-### sfc
-Call this function to create an SFC
-```js
-import { sfc } from 'photonic';
-const partitions = [/*...*/];
-const MySFC = sfc(partitions);
-```
-
-## Detecting overlapping partitions
-If you accidentally write overlapping partitions (i.e. multiple return true for some state) then Photonic will throw a warning in the console (in dev mode only). For example, both Foo and Bar will be active if state.a < 10.
-```js
-const partitions = [
+const tree = [
   {
     show: Foo,
     when: {{ state }} => state.a < 5,
